@@ -10,3 +10,4 @@ sentence-transformers
 torch
 transformers
 langchain-groq
+huggingface-hub

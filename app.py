@@ -9,8 +9,10 @@ from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings.base import Embeddings
 import hashlib
+from datasets import load_dataset # YENİ EKLENDİ
 
 # --- ÖNEMLİ: Hugging Face cache yollarını düzelt ---
+# Hugging Face Spaces'te önbellek sorunlarını önlemek için geçici dizin kullanır
 os.environ["HF_HOME"] = "/tmp/huggingface"
 os.environ["HF_DATASETS_CACHE"] = "/tmp/huggingface/datasets"
 os.environ["TRANSFORMERS_CACHE"] = "/tmp/huggingface/transformers"
@@ -68,19 +70,19 @@ def setup_rag_system(api_key, hf_token=None):
 
     # --- Dataset yükleme ---
     try:
-        from datasets import load_dataset
         
         with st.spinner("Dataset stream ediliyor... (İlk seferde 30 saniye sürebilir)"):
+            # load_dataset kullanımı, hf_token ile yetkilendirme sağlar
             dataset = load_dataset(
                 "umutertugrul/turkish-academic-theses-dataset",
                 split="train",
-                streaming=True,        # Streaming: cache gerekmez
-                token=hf_token,
+                streaming=True, 
+                token=hf_token, # HF Token'ı burada kullanıyoruz
                 cache_dir="/tmp/huggingface"
             )
 
             count = 0
-            max_docs = 100
+            max_docs = 100 # Demo için 100 tezle sınırlıyoruz
             for item in dataset:
                 if count >= max_docs:
                     break
@@ -108,7 +110,7 @@ def setup_rag_system(api_key, hf_token=None):
         if rag_documents:
             st.success(f"✅ {len(rag_documents)} Türk akademik tezi başarıyla stream edildi!")
         else:
-            raise Exception("Dataset boş döndü")
+            raise Exception("Dataset boş döndü veya erişim sağlanamadı.")
 
     except Exception as e:
         error_msg = str(e)
@@ -139,7 +141,6 @@ Konu: Çevre Mühendisliği
 Türkiye'nin büyük şehirlerinde hava kalitesi tahmini için LSTM ve Random Forest algoritmaları kullanılmıştır. İstanbul, Ankara ve İzmir'den toplanan 5 yıllık hava kalitesi verisi ile model eğitilmiş, PM2.5 ve PM10 değerleri %87 doğrulukla tahmin edilmiştir. Mevsimsel faktörlerin etkisi analiz edilmiştir.""",
                 metadata={"source": "YÖK", "doc_id": 1, "title": "ML ile Hava Kirliliği Tahmini", "author": "Zeynep Kaya", "year": "2022", "subject": "Çevre Mühendisliği"}
             )
-            # ... diğer örnek tezleri de ekleyebilirsin
         ]
         st.success(f"✅ {len(rag_documents)} yedek Türk akademik tezi yüklendi")
 
@@ -203,6 +204,7 @@ with st.expander("ℹ️ Nasıl Kullanılır?"):
 
 # --- API key fonksiyonları ---
 def get_api_key():
+    # Groq API Key
     api_key = os.environ.get("GROQ_API_KEY")
     if api_key:
         return api_key
@@ -212,11 +214,13 @@ def get_api_key():
         return None
 
 def get_hf_token():
-    token = os.environ.get("HF_TOKEN")
+    # Hugging Face Token (Gated Dataset Erişimi İçin)
+    # st.secrets, HF_TOKEN veya HUGGING_FACE_HUB_TOKEN olarak ayarlanmış olabilir.
+    token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
     if token:
         return token
     try:
-        return st.secrets.get("HF_TOKEN")
+        return st.secrets.get("HF_TOKEN") or st.secrets.get("HUGGING_FACE_HUB_TOKEN")
     except:
         return None
 
@@ -226,6 +230,11 @@ hf_token = get_hf_token()
 # --- Ana RAG çalışma akışı ---
 if groq_api_key:
     st.success("✅ Groq API Key bulundu!")
+    
+    # HF Token'ın varlığını kontrol ediyoruz
+    if not hf_token:
+        st.warning("⚠️ Hugging Face Token (HF_TOKEN) bulunamadı. Kilitli veri setine erişim başarısız olabilir.")
+
     rag_chain = setup_rag_system(groq_api_key, hf_token)
 
     if rag_chain:
@@ -280,13 +289,13 @@ else:
 # --- Sidebar ---
 st.sidebar.markdown("### 📊 Proje Bilgileri")
 st.sidebar.info("""
-**Veri Seti:**  
-YÖK Tez Merkezi  
+**Veri Seti:**  
+YÖK Tez Merkezi  
 (turkish-academic-theses-dataset)
 
-**Model:** Llama 3.1 (8B)  
-**Embedding:** Hash-based  
-**Vector DB:** ChromaDB  
+**Model:** Llama 3.1 (8B)  
+**Embedding:** Hash-based  
+**Vector DB:** ChromaDB  
 **Framework:** LangChain
 """)
 
