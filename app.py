@@ -10,15 +10,27 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings.base import Embeddings
 import hashlib
 
+# --- ÖNEMLİ: Hugging Face cache yollarını düzelt ---
+os.environ["HF_HOME"] = "/tmp/huggingface"
+os.environ["HF_DATASETS_CACHE"] = "/tmp/huggingface/datasets"
+os.environ["TRANSFORMERS_CACHE"] = "/tmp/huggingface/transformers"
+os.environ["XDG_CACHE_HOME"] = "/tmp/huggingface"
+os.environ["HF_HUB_CACHE"] = "/tmp/huggingface/hub"
+
+os.makedirs("/tmp/huggingface/datasets", exist_ok=True)
+os.makedirs("/tmp/huggingface/transformers", exist_ok=True)
+os.makedirs("/tmp/huggingface/hub", exist_ok=True)
+
+# --- Streamlit yapılandırması ---
 st.set_page_config(
-    page_title="Akademik Asistan",
-    page_icon="🤖",
+    page_title="Türk Akademik Tez Asistanı",
+    page_icon="🎓",
     layout="wide"
 )
 
+# --- Hash tabanlı embedding sınıfı ---
 class SimpleHashEmbeddings(Embeddings):
-    """Basit hash tabanlı embedding - model indirmeye gerek yok"""
-    
+    """Hash tabanlı embedding - model indirmeye gerek yok"""
     def __init__(self, dimension=384):
         self.dimension = dimension
     
@@ -35,192 +47,187 @@ class SimpleHashEmbeddings(Embeddings):
     def embed_query(self, text):
         return self.embed_documents([text])[0]
 
+# --- RAG sistemi kurulumu ---
 @st.cache_resource
-def setup_rag_system(api_key):
+def setup_rag_system(api_key, hf_token=None):
     if not api_key:
         st.error("❌ GROQ_API_KEY bulunamadı.")
         return None
     
-    st.info("🚀 Sistem başlatılıyor...")
-    
+    st.info("🚀 RAG sistemi başlatılıyor...")
+
     embedding_model = SimpleHashEmbeddings(dimension=256)
-    
     llm = ChatGroq(
         model="llama-3.1-8b-instant",
         groq_api_key=api_key,
         temperature=0.1
     )
-    
-    st.info("📚 Akademik makaleler yükleniyor...")
-    
-    # Veri setini kaldırıyoruz, sadece demo verisi kullanıyoruz
-    rag_documents = [
-        Document(
-            page_content="""Yapay Zeka ve Makine Öğrenmesi
-            
-Yapay zeka (AI), bilgisayarların insan zekasını taklit etmesini sağlayan bir teknolojidir. Makine öğrenmesi, yapay zekanın bir alt dalıdır ve bilgisayarların deneyimlerden öğrenmesini sağlar.
 
-Temel Kavramlar:
-- Denetimli Öğrenme: Etiketli verilerle eğitim
-- Denetimsiz Öğrenme: Etiketlenmemiş verilerde örüntü bulma
-- Pekiştirmeli Öğrenme: Deneme yanılma ile öğrenme
+    st.info("📚 Türk akademik tez veri seti yükleniyor...")
+    rag_documents = []
 
-Uygulamalar:
-Görüntü tanıma, doğal dil işleme, otonom araçlar, tıbbi teşhis sistemleri.""",
-            metadata={"source": "AI_Basics", "doc_id": 0, "title": "Yapay Zeka Temelleri"}
-        ),
-        Document(
-            page_content="""Derin Öğrenme ve Yapay Sinir Ağları
+    # --- Dataset yükleme ---
+    try:
+        from datasets import load_dataset
+        
+        with st.spinner("Dataset stream ediliyor... (İlk seferde 30 saniye sürebilir)"):
+            dataset = load_dataset(
+                "umutertugrul/turkish-academic-theses-dataset",
+                split="train",
+                streaming=True,        # Streaming: cache gerekmez
+                token=hf_token,
+                cache_dir="/tmp/huggingface"
+            )
 
-Derin öğrenme, çok katmanlı yapay sinir ağları kullanarak karmaşık problemleri çözen bir makine öğrenmesi tekniğidir.
+            count = 0
+            max_docs = 100
+            for item in dataset:
+                if count >= max_docs:
+                    break
+                if item.get('abstract_tr') and item.get('title_tr'):
+                    title = item['title_tr']
+                    abstract = item['abstract_tr']
+                    author = item.get('author', 'Bilinmeyen')
+                    year = item.get('year', 'Bilinmeyen')
+                    subject = item.get('subject', 'Genel')
 
-Önemli Mimariler:
-- Konvolüsyonel Sinir Ağları (CNN): Görüntü işleme için
-- Tekrarlayan Sinir Ağları (RNN): Zaman serisi ve dil modelleme için
-- Transformer: Modern dil modelleri (GPT, BERT) için
+                    content = f"Başlık: {title}\n\nYazar: {author}\nYıl: {year}\nKonu: {subject}\n\nÖzet:\n{abstract}"
+                    rag_documents.append(Document(
+                        page_content=content,
+                        metadata={
+                            "source": "YÖK Tez Merkezi",
+                            "doc_id": count,
+                            "title": title,
+                            "author": author,
+                            "year": str(year),
+                            "subject": subject
+                        }
+                    ))
+                    count += 1
 
-Başarı Hikayeleri:
-AlphaGo, GPT serisi, DALL-E, ChatGPT gibi sistemler derin öğrenme ile geliştirilmiştir.
+        if rag_documents:
+            st.success(f"✅ {len(rag_documents)} Türk akademik tezi başarıyla stream edildi!")
+        else:
+            raise Exception("Dataset boş döndü")
 
-Zorluklar:
-Yüksek hesaplama maliyeti, büyük veri ihtiyacı, açıklanabilirlik sorunları.""",
-            metadata={"source": "Deep_Learning", "doc_id": 1, "title": "Derin Öğrenme"}
-        ),
-        Document(
-            page_content="""Doğal Dil İşleme (NLP)
+    except Exception as e:
+        error_msg = str(e)
+        st.warning(f"⚠️ Dataset stream edilemedi: {error_msg[:200]}...")
+        st.info("💡 Yedek veri seti kullanılıyor")
 
-Doğal dil işleme, bilgisayarların insan dilini anlaması ve işlemesi için kullanılan yapay zeka dalıdır.
+        # --- Yedek veri seti ---
+        rag_documents = [
+            Document(
+                page_content="""Başlık: Derin Öğrenme Yöntemleri ile Türkçe Doğal Dil İşleme
 
-Temel Görevler:
-- Metin sınıflandırma
-- Duygu analizi
-- Makine çevirisi
-- Soru-cevap sistemleri
-- Metin üretimi
+Yazar: Ahmet Yılmaz
+Yıl: 2023
+Konu: Bilgisayar Mühendisliği
 
-Modern Yaklaşımlar:
-Transformer mimarisi ve transfer öğrenme, NLP'de devrim yaratmıştır. BERT, GPT gibi modeller, önceden eğitilmiş büyük dil modelleridir.
+Özet:
+Bu tez çalışmasında, Türkçe dil işleme görevleri için derin öğrenme tabanlı yöntemler geliştirilmiştir. BERT ve GPT mimarileri Türkçe korpus üzerinde fine-tune edilmiş, metin sınıflandırma ve duygu analizi görevlerinde %92.5 F1-score elde edilmiştir. TürkçeBERT modeli geliştirilmiş ve açık kaynak olarak paylaşılmıştır.""",
+                metadata={"source": "YÖK", "doc_id": 0, "title": "Derin Öğrenme ile Türkçe NLP", "author": "Ahmet Yılmaz", "year": "2023", "subject": "Bilgisayar Mühendisliği"}
+            ),
+            Document(
+                page_content="""Başlık: Makine Öğrenmesi ile Türkiye'de Hava Kirliliği Tahmini
 
-Türkçe NLP:
-Türkçe morfolojik açıdan zengin bir dildir. Ek yapısı, NLP görevlerini zorlaştırır ancak son yıllarda Türkçe için özel modeller geliştirilmiştir.""",
-            metadata={"source": "NLP", "doc_id": 2, "title": "Doğal Dil İşleme"}
-        ),
-        Document(
-            page_content="""Bilgisayarlı Görü
+Yazar: Zeynep Kaya
+Yıl: 2022
+Konu: Çevre Mühendisliği
 
-Bilgisayarlı görü, makinelerin görsel dünyayı anlamasını sağlayan yapay zeka alanıdır.
+Özet:
+Türkiye'nin büyük şehirlerinde hava kalitesi tahmini için LSTM ve Random Forest algoritmaları kullanılmıştır. İstanbul, Ankara ve İzmir'den toplanan 5 yıllık hava kalitesi verisi ile model eğitilmiş, PM2.5 ve PM10 değerleri %87 doğrulukla tahmin edilmiştir. Mevsimsel faktörlerin etkisi analiz edilmiştir.""",
+                metadata={"source": "YÖK", "doc_id": 1, "title": "ML ile Hava Kirliliği Tahmini", "author": "Zeynep Kaya", "year": "2022", "subject": "Çevre Mühendisliği"}
+            )
+            # ... diğer örnek tezleri de ekleyebilirsin
+        ]
+        st.success(f"✅ {len(rag_documents)} yedek Türk akademik tezi yüklendi")
 
-Temel Uygulamalar:
-- Nesne tanıma ve tespiti
-- Yüz tanıma
-- Görüntü segmentasyonu
-- Otonom araç navigasyonu
-- Tıbbi görüntü analizi
-
-Teknolojiler:
-CNN'ler, görüntü işlemede en başarılı modellerdir. ResNet, YOLO, U-Net gibi mimariler farklı görevlerde kullanılır.
-
-Gelecek Trendler:
-3D görü, video analizi, gerçek zamanlı işleme.""",
-            metadata={"source": "Computer_Vision", "doc_id": 3, "title": "Bilgisayarlı Görü"}
-        ),
-        Document(
-            page_content="""RAG (Retrieval Augmented Generation)
-
-RAG, büyük dil modellerinin bilgi tabanından ilgili belgeleri alıp yanıt üretmesini sağlayan bir tekniktir.
-
-Nasıl Çalışır:
-1. Kullanıcı sorusu alınır
-2. Embedding ile vektör haline getirilir
-3. Vektör veritabanında benzer belgeler aranır
-4. Bulunan belgeler LLM'e context olarak verilir
-5. LLM, context kullanarak yanıt üretir
-
-Avantajlar:
-- Güncel bilgi kullanımı
-- Hallüsinasyon azalması
-- Domain-specific bilgi
-- Kaynak gösterme
-
-Bu chatbot da RAG mimarisi kullanmaktadır.""",
-            metadata={"source": "RAG_Tech", "doc_id": 4, "title": "RAG Teknolojisi"}
-        )
-    ]
-    
-    st.success(f"✅ {len(rag_documents)} demo makalesi yüklendi!")
-    
+    # --- Text splitting ---
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50,
+        chunk_size=700,
+        chunk_overlap=100,
         separators=["\n\n", "\n", ". ", " "]
     )
     chunks = text_splitter.split_documents(rag_documents)
-    
-    st.info(f"📊 {len(chunks)} metin parçası oluşturuldu...")
-    
+    st.info(f"📊 {len(chunks)} metin parçası oluşturuldu")
+
+    # --- Vektör veritabanı ---
     vectorstore = Chroma.from_documents(
         documents=chunks,
         embedding=embedding_model,
-        persist_directory="/tmp/chroma_db"
+        persist_directory="/tmp/turkish_thesis_db"
     )
-    
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-    
-    system_prompt = """Sen Türkçe konuşan bilimsel makale uzmanı bir assistantsın. 
 
-Görevin:
-- Sadece verilen bağlam kullanarak cevap ver
-- Türkçe ve anlaşılır bir dil kullan
-- Bilimsel terimleri açıkla
-- Emin olmadığın konularda "Bu bilgi verilen metinde bulunmuyor" de
+    retriever = vectorstore.as_retriever(
+        search_type="similarity",
+        search_kwargs={"k": 4}
+    )
 
-Bağlam: {context}"""
-    
+    # --- Türkçe prompt ---
+    system_prompt = """Sen Türk akademik tezlerini analiz eden bir asistansın.
+
+Görevlerin:
+1. Verilen bağlam (tezler) kullanarak Türkçe cevap ver
+2. Tez başlıklarını, yazarlarını ve yıllarını belirt
+3. Bulguları ve yöntemleri açıkla
+4. Emin olmadığın konularda "Bu bilgi verilen tezlerde yok" de
+
+Bağlam (Tezler):
+{context}"""
+
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt),
         ("human", "{input}")
     ])
-    
+
     document_chain = create_stuff_documents_chain(llm, prompt)
     rag_chain = create_retrieval_chain(retriever, document_chain)
     
-    st.success("✅ RAG Sistemi Hazır! Artık soru sorabilirsiniz.")
+    st.success("✅ RAG Sistemi Hazır!")
     return rag_chain
 
-st.title("🔬 Bilimsel Makale Özetleyici Chatbot")
-st.markdown("**Gemini Flash ve RAG mimarisi** ile bilimsel makalelerden özetler çıkarır.")
+# --- UI ---
+st.title("🎓 Türk Akademik Tez Araştırma Asistanı")
+st.markdown("**RAG + Llama 3.1** ile Türk akademik tezlerinden bilgi çıkarır")
 
 with st.expander("ℹ️ Nasıl Kullanılır?"):
     st.markdown("""
-    1. **Makale hakkında soru sorun:** "Yapay zeka nedir?"
-    2. **Özet isteyin:** "Bu makaleleri özetle"
-    3. **Karşılaştırma yapın:** "Hangi yöntemler kullanılmış?"
-    
-    **Not:** Chatbot sadece yüklenen makalelerden bilgi verir.
+    **Örnek Sorular:**
+    - "Türkçe NLP çalışmaları hakkında bilgi ver"
+    - "Siber güvenlik alanında hangi tezler var?"
+    - "Makine öğrenmesi ile ilgili tezleri listele"
+    - "2023 yılındaki tezler neler?"
+    - "Çevre mühendisliği alanında neler yapılmış?"
     """)
 
-def get_huggingface_secret():
+# --- API key fonksiyonları ---
+def get_api_key():
+    api_key = os.environ.get("GROQ_API_KEY")
+    if api_key:
+        return api_key
     try:
-        api_key = os.environ.get("GROQ_API_KEY")
-        if api_key:
-            return api_key
-        try:
-            api_key = st.secrets["GROQ_API_KEY"]
-            return api_key
-        except:
-            pass
-        return None
-    except Exception as e:
-        st.error(f"Secret alma hatası: {e}")
+        return st.secrets["GROQ_API_KEY"]
+    except:
         return None
 
-groq_api_key = get_huggingface_secret()
+def get_hf_token():
+    token = os.environ.get("HF_TOKEN")
+    if token:
+        return token
+    try:
+        return st.secrets.get("HF_TOKEN")
+    except:
+        return None
 
+groq_api_key = get_api_key()
+hf_token = get_hf_token()
+
+# --- Ana RAG çalışma akışı ---
 if groq_api_key:
-    st.success("✅ API Key bulundu!")
-    
-    rag_chain = setup_rag_system(groq_api_key)
-    
+    st.success("✅ Groq API Key bulundu!")
+    rag_chain = setup_rag_system(groq_api_key, hf_token)
+
     if rag_chain:
         if "messages" not in st.session_state:
             st.session_state.messages = []
@@ -229,58 +236,60 @@ if groq_api_key:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
         
-        if prompt := st.chat_input("Makalelerle ilgili soru sorun (örn: 'Yapay zeka nedir?')"):
+        if prompt := st.chat_input("Türk akademik tezleri hakkında soru sorun..."):
             st.session_state.messages.append({"role": "user", "content": prompt})
             with st.chat_message("user"):
                 st.markdown(prompt)
             
             with st.chat_message("assistant"):
-                with st.spinner("🔍 Makaleler aranıyor ve cevap oluşturuluyor..."):
+                with st.spinner("🔍 Tezler aranıyor..."):
                     try:
                         response = rag_chain.invoke({"input": prompt})
                         answer = response['answer']
-                        
                         sources = response.get('context', [])
                         if sources:
-                            answer += f"\n\n📚 **Kaynak:** {len(sources)} makale parçasından bilgi kullanıldı."
+                            titles = set()
+                            for doc in sources:
+                                title = doc.metadata.get('title', 'Bilinmeyen')
+                                author = doc.metadata.get('author', '')
+                                year = doc.metadata.get('year', '')
+                                titles.add(f"{title} ({author}, {year})")
+                            if titles:
+                                answer += f"\n\n📚 **Kaynak Tezler:**\n" + "\n".join([f"- {t}" for t in list(titles)[:3]])
                     except Exception as e:
-                        answer = f"❌ Bir hata oluştu: {str(e)}\n\nLütfen soruyu yeniden deneyin."
-                
+                        answer = f"❌ Hata: {str(e)}"
                 st.markdown(answer)
-            
             st.session_state.messages.append({"role": "assistant", "content": answer})
         
-        if st.session_state.messages:
-            if st.button("🗑️ Sohbeti Temizle"):
+        col1, col2 = st.columns([1, 5])
+        with col1:
+            if st.button("🗑️ Temizle"):
                 st.session_state.messages = []
                 st.rerun()
+
 else:
     st.error("""
     ❌ **GROQ_API_KEY bulunamadı!**
     
-    **Ücretsiz Groq API Key almak için:**
-    1. https://console.groq.com/keys adresine git
-    2. Sign up ile üye ol (ücretsiz)
-    3. Create API Key tıkla
-    4. Key'i kopyala
-    
-    **Hugging Face Spaces'e ekle:**
-    1. Space Settings → Repository secrets
-    2. New secret: `GROQ_API_KEY` = `gsk_...`
-    3. Sayfayı yenile
-    
-    **Neden Groq?**
-    - Tamamen ücretsiz
-    - Çok hızlı (Gemini'den 10x hızlı)
-    - Llama 3 modeli kullanıyor
+    **API Key almak için:**
+    1. https://console.groq.com/keys
+    2. Sign up → Create API Key
+    3. Streamlit secrets veya environment variable olarak ekle
     """)
-    
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 🔧 Sistem Bilgisi")
+
+# --- Sidebar ---
+st.sidebar.markdown("### 📊 Proje Bilgileri")
 st.sidebar.info("""
-**Model:** Llama 3.1 (8B Instant)  
-**API:** Groq (Ücretsiz)  
+**Veri Seti:**  
+YÖK Tez Merkezi  
+(turkish-academic-theses-dataset)
+
+**Model:** Llama 3.1 (8B)  
 **Embedding:** Hash-based  
-**Veri:** 5 demo makalesi  
-**RAG Framework:** LangChain
+**Vector DB:** ChromaDB  
+**Framework:** LangChain
 """)
+
+st.sidebar.markdown("### 📌 İstatistikler")
+if 'messages' in st.session_state:
+    st.sidebar.metric("Toplam Soru", len([m for m in st.session_state.messages if m["role"]=="user"]))
