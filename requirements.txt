@@ -1,0 +1,12 @@
+streamlit
+langchain
+langchain-community
+langchain-chroma
+langchain-google-genai
+langchain-huggingface
+chromadb
+datasets
+sentence-transformers
+torch
+transformers
+langchain-groq
