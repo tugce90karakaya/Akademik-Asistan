@@ -1,3 +1,13 @@
+---
+title: Bilimsel Makale Özetleyici Chatbot
+emoji: 🔬
+colorFrom: indigo
+colorTo: blue
+sdk: streamlit
+sdk_version: "1.33.0"  # Veya kullandığınız Streamlit sürümü
+app_file: app.py
+pinned: true
+---
 # 🔬 Bilimsel Makale Özetleyici Chatbot
 
 Bu proje, **Streamlit** ile oluşturulmuş, **Groq'un Llama 3.1** Büyük Dil Modelini (LLM) kullanarak **RAG (Retrieval Augmented Generation)** mimarisiyle bilimsel makalelerden bilgi çıkaran hızlı bir soru-cevap asistanıdır.
