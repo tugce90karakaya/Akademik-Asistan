@@ -106,15 +106,30 @@ streamlit run project.py
 ---
 Uygulama otomatik olarak tarayıcınızda açılacaktır.
 👉[http://localhost:8501/](http://localhost:8501/)
+---
+### 🚀 Docker Image Oluşturma ve Çalıştırma
+Projenin, tüm kullanıcılarda tutarlı şekilde çalışması için DockerFile dosyasını kullanabilirsiniz.
+
+### 1️⃣ Docker Image Oluştur
+```bash
+docker build -t image_adı .
+```
+### 2️⃣ Container'ı Çalıştır
+```bash
+docker run -p 8501:8501 image_adı
+```
+### 🌐Erişim
+Container çalıştıktan sonra aşağıdaki adresten ulaşabilirsiniz.
+[http://localhost:8501/](http://localhost:8501/)
 
 ### 📁 Proje Yapısı
 ```bash
 .
 ├── app.py              # 🚀 Ana Uygulama Dosyası. Tüm RAG mantığı, LangChain zinciri, ChromaDB kurulumu ve Streamlit arayüz kodu bu dosyada yer alır.
 ├── requirements.txt    # 📦 Bağımlılıklar. Projenin ihtiyaç duyduğu tüm Python kütüphaneleri (streamlit, langchain-groq, datasets vb.) bu dosyada listelenir.
+├── Dockerfile          # 🐳 Containerizasyon. Uygulamayı Docker container'ında çalıştırmak için gerekli yapılandırma dosyası.
 ├── .env                # 🔑 Gizli Anahtarlar. Groq API Key gibi hassas bilgiler burada saklanır. **Bu dosya Git deposuna ASLA dahil edilmemelidir.**
-└── README.md           # 📜 Bu Dosya. Projenin genel açıklaması, mimarisi ve adım adım kurulum talimatları.
-```      
-
+└── README.md           # 📜 Bu Dosya. Projenin genel açıklaması, mimarisi ve adım adım kurulum talimatları.     
+```
 
 
