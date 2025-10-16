@@ -67,24 +67,24 @@ Aşağıda örnek bir veri yapısı gösterilmektedir:
 ## 💡 Projeyi Kendi Bilgisayarında Çalıştırmak İçin
 
 Bu projeyi GitHub üzerinden klonlayarak kendi bilgisayarınızda birkaç adımda çalıştırabilirsiniz 👇  
-
+---
 ### 1️⃣ Depoyu Klonlayın
 GitHub sayfamdan projeyi kopyalayın:
 ```bash
 git clone https://github.com/kullaniciadi/akademik-tez-asistani.git
 cd akademik-tez-asistani
-
+---
 ### 2️⃣ Sanal Ortam Oluşturun (Opsiyonel ama Önerilir) 
 GitHub sayfamdan projeyi kopyalayın:
 ```bash
 python3 -m venv venv
 source venv/bin/activate  # macOS/Linux
 # venv\Scripts\activate   # Windows
-
+---
 ### 3️⃣ Gerekli Kütüphaneleri Yükleyin
 ```bash
 pip install -r requirements.txt
-
+---
 ### 4️⃣ API Anahtarlarını Ayarlayın
 Proje kök dizininde .env dosyası oluşturun
 ```bash
@@ -92,12 +92,12 @@ touch .env
 İçine aşağıdaki gibi kendi anahtarlarınızı ekleyin:
 ```bash
 GROQ_API_KEY="Kendi API anahtarınızı yazınız"
-
+---
 ### 5️⃣ Uygulamayı Başlatın
 Uygulamayı başlatmak için aşağıdaki kodu çalıştırın:
 ```bash
 streamlit run project.py
-
+---
 Uygulama otomatik olarak tarayıcınızda açılacaktır.
 👉[http://localhost:8501/](http://localhost:8501/)
 
