@@ -62,7 +62,6 @@ Aşağıda örnek bir veri yapısı gösterilmektedir:
   "subject": "Çevre Mühendisliği"
 }
 ---
-
 ## 💡 Projeyi Kendi Bilgisayarında Çalıştırmak İçin
 
 Bu projeyi GitHub üzerinden klonlayarak kendi bilgisayarınızda birkaç adımda çalıştırabilirsiniz 👇  
