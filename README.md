@@ -119,7 +119,7 @@ docker build -t image_adı .
 docker run -p 8501:8501 image_adı
 ```
 ### 🌐Erişim
-Container çalıştıktan sonra aşağıdaki adresten ulaşabilirsiniz.
+Container çalıştıktan sonra yandaki adresten ulaşabilirsiniz.
 [http://localhost:8501/](http://localhost:8501/)
 
 ### 📁 Proje Yapısı
