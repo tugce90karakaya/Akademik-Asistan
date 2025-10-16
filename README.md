@@ -61,6 +61,8 @@ Aşağıda örnek bir veri yapısı gösterilmektedir:
   "year": "2022",
   "subject": "Çevre Mühendisliği"
 }
+
+```
 ---
 ## 💡 Projeyi Kendi Bilgisayarında Çalıştırmak İçin
 
