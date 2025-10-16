@@ -107,7 +107,7 @@ streamlit run project.py
 Uygulama otomatik olarak tarayıcınızda açılacaktır.
 👉[http://localhost:8501/](http://localhost:8501/)
 ---
-### 🚀 Docker Image Oluşturma ve Çalıştırma
+### 🐳 Docker Image Oluşturma ve Çalıştırma
 Projenin, tüm kullanıcılarda tutarlı şekilde çalışması için DockerFile dosyasını kullanabilirsiniz.
 
 ### 1️⃣ Docker Image Oluştur
