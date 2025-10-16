@@ -106,4 +106,13 @@ streamlit run project.py
 ---
 Uygulama otomatik olarak tarayıcınızda açılacaktır.
 👉[http://localhost:8501/](http://localhost:8501/)
+---
+### 📁 Proje Yapısı
+.
+├── app.py           # Ana uygulama dosyası
+├── requirements.txt     # Gerekli Python kütüphaneleri
+├── .env                 # API anahtarları (git'e dahil edilmez)
+└── README.md            # Bu dosya
+
+
 
