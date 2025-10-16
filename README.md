@@ -109,10 +109,10 @@ Uygulama otomatik olarak tarayıcınızda açılacaktır.
 
 ### 📁 Proje Yapısı
 .
-├── app.py           # Ana uygulama dosyası
-├── requirements.txt     # Gerekli Python kütüphaneleri
-├── .env                 # API anahtarları (git'e dahil edilmez)
-└── README.md            # Bu dosya
+├── app.py              # 🚀 Ana Uygulama Dosyası. Tüm RAG mantığı, LangChain zinciri, ChromaDB kurulumu ve Streamlit arayüz kodu bu dosyada yer alır.
+├── requirements.txt    # 📦 Bağımlılıklar. Projenin ihtiyaç duyduğu tüm Python kütüphaneleri (streamlit, langchain-groq, datasets vb.) bu dosyada listelenir.
+├── .env                # 🔑 Gizli Anahtarlar. Groq API Key gibi hassas bilgiler burada saklanır. **Bu dosya Git deposuna ASLA dahil edilmemelidir.**
+└── README.md           # 📜 Bu Dosya. Projenin genel açıklaması, mimarisi ve adım adım kurulum talimatları.
 
 
 
