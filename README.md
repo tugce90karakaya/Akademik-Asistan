@@ -61,3 +61,14 @@ Aşağıda örnek bir veri yapısı gösterilmektedir:
   "year": "2022",
   "subject": "Çevre Mühendisliği"
 }
+---
+
+## 💡 Projeyi Kendi Bilgisayarında Çalıştırmak İçin
+
+Bu projeyi GitHub üzerinden klonlayarak kendi bilgisayarınızda birkaç adımda çalıştırabilirsiniz 👇  
+
+### 1️⃣ Depoyu Klonlayın
+GitHub sayfamdan projeyi kopyalayın:
+```bash
+git clone https://github.com/kullaniciadi/akademik-tez-asistani.git
+cd akademik-tez-asistani
