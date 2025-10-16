@@ -71,8 +71,8 @@ Bu projeyi GitHub üzerinden klonlayarak kendi bilgisayarınızda birkaç adımd
 ### 1️⃣ Depoyu Klonlayın
 GitHub sayfamdan projeyi kopyalayın:
 ```bash
-git clone https://github.com/kullaniciadi/akademik-tez-asistani.git
-cd akademik-tez-asistani
+git clone https://github.com/tugce90karakaya/Akademik-Asistan.git
+cd Akademik-Asistan
 ```
 ---
 ### 2️⃣ Sanal Ortam Oluşturun (Opsiyonel ama Önerilir) 
