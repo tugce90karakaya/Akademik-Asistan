@@ -1,41 +1,63 @@
 ---
-title: Bilimsel Makale Özetleyici Chatbot
-emoji: 🔬
-colorFrom: indigo
-colorTo: blue
+title: Türk Akademik Tez Araştırma Asistanı 🎓
+emoji: 📚
+colorFrom: blue
+colorTo: indigo
 sdk: streamlit
 sdk_version: "1.33.0"
 app_file: app.py
 pinned: true
 ---
-# 🔬 Bilimsel Makale Özetleyici Chatbot
 
-Bu proje, **Streamlit** ile oluşturulmuş, **Groq'un Llama 3.1** Büyük Dil Modelini (LLM) kullanarak **RAG (Retrieval Augmented Generation)** mimarisiyle bilimsel makalelerden bilgi çıkaran hızlı bir soru-cevap asistanıdır.
+# 🎓 Türk Akademik Tez Araştırma Asistanı
 
-Uygulama, verilen demo makaleleri içinden ilgili bilgileri alıp (Retrieval) bu bağlamı kullanarak doğru ve kaynaklı yanıtlar üretir (Generation).
-
----
-
-### 🚀 Özellikler
-
-* **Groq Entegrasyonu:** Düşük gecikmeli, yüksek hızlı yanıtlar için Groq API'si kullanılır.
-* **RAG Mimarisi:** Doğruluk ve kaynak gösterme yeteneği için LangChain ile RAG zinciri oluşturulmuştur.
-* **Basit Embedding:** Harici model indirmeye gerek kalmadan, basit **Hash-tabanlı Embedding** sınıfı kullanılarak vektör veritabanı (ChromaDB) oluşturulur.
-* **Streamlit Arayüzü:** Kullanıcı dostu, hızlı ve etkileşimli web arayüzü.
+Bu proje, **RAG (Retrieval Augmented Generation)** mimarisi kullanarak **Türk akademik tezlerinden bilgi çıkaran** bir yapay zekâ araştırma asistanıdır.  
+Uygulama, **LangChain**, **ChromaDB**, ve **Groq API (Llama 3.1)** teknolojilerini bir araya getirir.  
+Kullanıcı, Türkçe olarak tezlerle ilgili sorular sorar ve sistem en uygun tez özetlerinden **kaynaklı, doğru ve doğal** yanıtlar üretir.
 
 ---
 
-### ⚙️ Kurulum ve Çalıştırma
+## 🚀 Özellikler
 
-Bu uygulamayı yerel makinenizde veya bir bulut servisinde çalıştırmak için aşağıdaki adımları takip edin.
+| Özellik | Açıklama |
+|----------|-----------|
+| 🧠 **Groq Llama 3.1 Entegrasyonu** | Düşük gecikmeli, yüksek doğruluklu yanıtlar için Groq API’si kullanılır. |
+| 🔍 **RAG (Retrieval-Augmented Generation)** | Bilgiyi doğrudan akademik tezlerden çekerek yanıt üretir. |
+| 💾 **Hash-tabanlı Embedding** | Harici model indirmeden, SHA-256 tabanlı embedding ile hızlı vektör temsili sağlar. |
+| 🗄️ **ChromaDB Vektör Veritabanı** | Tez parçacıkları embedding’lenir ve ChromaDB içinde benzerlik aramaları yapılır. |
+| 🧩 **LangChain Pipeline** | Retriever + LLM + Prompt yönetimini otomatikleştirir. |
+| 💬 **Streamlit Arayüzü** | Kullanıcı dostu web arayüzü ile etkileşimli soru-cevap deneyimi sağlar. |
 
-#### 1. Proje Dosyaları
+---
 
-* `app.py`: Uygulamanın tüm Python kodu bu dosyada yer alır.
+## 📚 Kullanılan Teknolojiler
 
-#### 2. Gerekli Kütüphaneleri Yükleme
+| Teknoloji | Amaç |
+|------------|------|
+| [Streamlit](https://streamlit.io) | Web arayüzü oluşturma |
+| [LangChain](https://www.langchain.com) | RAG zinciri, prompt yönetimi ve pipeline oluşturma |
+| [ChromaDB](https://www.trychroma.com) | Vektör veritabanı ve benzerlik araması |
+| [Groq API](https://console.groq.com/) | Llama 3.1 LLM entegrasyonu |
+| [Hugging Face Datasets](https://huggingface.co/datasets/umutertugrul/turkish-academic-theses-dataset) | Türk akademik tez verisi kaynağı |
+| [Python hashlib](https://docs.python.org/3/library/hashlib.html) | Hash-tabanlı embedding oluşturma |
 
-Terminalinizde aşağıdaki komutu çalıştırarak gerekli tüm bağımlılıkları yükleyin:
+---
 
-```bash
-pip install streamlit langchain-chroma langchain-groq python-dotenv
+## 🧾 Veri Seti Hakkında
+
+### 📘 Kaynak:
+**Dataset Adı:** [`umutertugrul/turkish-academic-theses-dataset`](https://huggingface.co/datasets/umutertugrul/turkish-academic-theses-dataset)  
+**Sağlayıcı:** [YÖK Tez Merkezi](https://tez.yok.gov.tr/UlusalTezMerkezi/)
+
+### 🧩 İçerik:
+Bu veri seti, YÖK Tez Merkezi’nden derlenmiş Türkçe yüksek lisans ve doktora tezlerinin **başlık**, **yazar**, **yıl**, **konu** ve **özet** bilgilerini içerir.  
+Aşağıda örnek bir veri yapısı gösterilmektedir:
+
+```json
+{
+  "title_tr": "Makine Öğrenmesi ile Hava Kirliliği Tahmini",
+  "abstract_tr": "Bu tezde Türkiye'de hava kalitesinin tahmini için LSTM modelleri kullanılmıştır...",
+  "author": "Zeynep Kaya",
+  "year": "2022",
+  "subject": "Çevre Mühendisliği"
+}
