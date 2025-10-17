@@ -129,7 +129,7 @@ Container çalıştıktan sonra yandaki adresten ulaşabilirsiniz.
 ├── requirements.txt     # 📦 Bağımlılıklar. Projenin ihtiyaç duyduğu tüm Python kütüphaneleri (streamlit, langchain-groq, datasets vb.) bu dosyada listelenir.
 ├── Dockerfile           # 🐳 Containerizasyon. Uygulamayı Docker container'ında çalıştırmak için gerekli yapılandırma dosyası.
 ├── .env                 # 🔑 Gizli Anahtarlar. Groq API Key gibi hassas bilgiler burada saklanır. **Bu dosya Git deposuna ASLA dahil edilmemelidir.**
-├── r1.jpg               # 🖼️ Projenin ekran görüntüsü
+├── Ekran-Goruntusu.jpg  # 🖼️ Projenin ekran görüntüsü
 ├── Akademik-Asistan.gif # 🎬 Projenin canlı demosu
 └── README.md            # 📜 Bu Dosya. Projenin genel açıklaması, mimarisi ve adım adım kurulum talimatları.     
 ```
