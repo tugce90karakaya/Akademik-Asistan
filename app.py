@@ -323,7 +323,7 @@ Bağlam (Tezler):
 # =============================================================================
 
 # --- Sayfa Başlığı ---
-st.title("🎓 Türk Akademik Tez Araştırma Asistanı")
+st.title("🎓 Akademik Asistan")
 st.markdown("**RAG + Llama 3.1** ile Türk akademik tezlerinden bilgi çıkarır")
 
 # --- Kullanım Kılavuzu (Genişletilebilir) ---
