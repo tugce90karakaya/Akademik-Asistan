@@ -136,7 +136,7 @@ Container çalıştıktan sonra yandaki adresten ulaşabilirsiniz.
 ![Ana ekranın görünümü](./r1.jpg)
 ---
 ### 🎬 Canlı Demo
-
+![Proje Kullanım Demosu](./Akademik_Asistan.gif)
 
 
 
