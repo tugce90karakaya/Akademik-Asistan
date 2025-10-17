@@ -125,28 +125,20 @@ Container çalıştıktan sonra yandaki adresten ulaşabilirsiniz.
 ### 📁 Proje Yapısı
 ```bash
 .
-├── app.py              # 🚀 Ana Uygulama Dosyası. Tüm RAG mantığı, LangChain zinciri, ChromaDB kurulumu ve Streamlit arayüz kodu bu dosyada yer alır.
-├── requirements.txt    # 📦 Bağımlılıklar. Projenin ihtiyaç duyduğu tüm Python kütüphaneleri (streamlit, langchain-groq, datasets vb.) bu dosyada listelenir.
-├── Dockerfile          # 🐳 Containerizasyon. Uygulamayı Docker container'ında çalıştırmak için gerekli yapılandırma dosyası.
-├── .env                # 🔑 Gizli Anahtarlar. Groq API Key gibi hassas bilgiler burada saklanır. **Bu dosya Git deposuna ASLA dahil edilmemelidir.**
-└── README.md           # 📜 Bu Dosya. Projenin genel açıklaması, mimarisi ve adım adım kurulum talimatları.     
+├── app.py               # 🚀 Ana Uygulama Dosyası. Tüm RAG mantığı, LangChain zinciri, ChromaDB kurulumu ve Streamlit arayüz kodu bu dosyada yer alır.
+├── requirements.txt     # 📦 Bağımlılıklar. Projenin ihtiyaç duyduğu tüm Python kütüphaneleri (streamlit, langchain-groq, datasets vb.) bu dosyada listelenir.
+├── Dockerfile           # 🐳 Containerizasyon. Uygulamayı Docker container'ında çalıştırmak için gerekli yapılandırma dosyası.
+├── .env                 # 🔑 Gizli Anahtarlar. Groq API Key gibi hassas bilgiler burada saklanır. **Bu dosya Git deposuna ASLA dahil edilmemelidir.**
+├── r1.jpg               # 🖼️ Projenin ekran görüntüsü
+├── Akademik-Asistan.gif # 🎬 Projenin canlı demosu
+└── README.md            # 📜 Bu Dosya. Projenin genel açıklaması, mimarisi ve adım adım kurulum talimatları.     
 ```
 ---
 ### 🖼️ Projenin Ekran Görüntüsü
 ![Ana ekranın görünümü](./r1.jpg)
 ---
 ### 🎬 Canlı Demo
-![Proje Kullanım Demosu](./Akademik_Asistan.gif)
+![Proje Kullanım Demosu](./Akademik-Asistan.gif)
 ---
 ### 🚀 Deploy Linki
 [https://huggingface.co/spaces/tugce90/Akademik_Asistan](https://huggingface.co/spaces/tugce90/Akademik_Asistan)
-
-
-
-
-
-
-
-
-
-
