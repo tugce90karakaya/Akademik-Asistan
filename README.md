@@ -132,8 +132,10 @@ Container çalıştıktan sonra yandaki adresten ulaşabilirsiniz.
 └── README.md           # 📜 Bu Dosya. Projenin genel açıklaması, mimarisi ve adım adım kurulum talimatları.     
 ```
 ---
-### 🖼️ Projenin Ekran Görüntüleri
+### 🖼️ Projenin Ekran Görüntüsü
 ![Ana ekranın görünümü](./r1.jpg)
+---
+### 🎬 Canlı Demo
 
 
 
