@@ -131,5 +131,19 @@ Container çalıştıktan sonra yandaki adresten ulaşabilirsiniz.
 ├── .env                # 🔑 Gizli Anahtarlar. Groq API Key gibi hassas bilgiler burada saklanır. **Bu dosya Git deposuna ASLA dahil edilmemelidir.**
 └── README.md           # 📜 Bu Dosya. Projenin genel açıklaması, mimarisi ve adım adım kurulum talimatları.     
 ```
+---
+### 🖼️ Projenin Ekran Görüntüleri
+![Ana ekranın görünümü](./r1.jpg)
+
+
+
+
+
+
+
+
+
+
+
 
 
