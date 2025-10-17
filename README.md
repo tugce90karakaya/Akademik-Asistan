@@ -137,8 +137,9 @@ Container çalıştıktan sonra yandaki adresten ulaşabilirsiniz.
 ---
 ### 🎬 Canlı Demo
 ![Proje Kullanım Demosu](./Akademik_Asistan.gif)
-
-
+---
+### 🚀 Deploy Linki
+[https://huggingface.co/spaces/tugce90/Akademik_Asistan](https://huggingface.co/spaces/tugce90/Akademik_Asistan)
 
 
 
